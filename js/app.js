@@ -34,6 +34,7 @@ let count = 0;
 let firstRandomIndex;
 let secondRandomIndex;
 let lastRandomIndex;
+let storageIndex = [];
 
 function SelectProduct(name, path) {
     this.name = name;
@@ -53,12 +54,13 @@ function render() {
     firstRandomIndex = randomProduct(0, imagesArr.length - 1);
     secondRandomIndex = randomProduct(0, imagesArr.length - 1);
     lastRandomIndex = randomProduct(0, imagesArr.length - 1);
-
+    
     do {
+        firstRandomIndex = randomProduct(0, imagesArr.length - 1);
         secondRandomIndex = randomProduct(0, imagesArr.length - 1);
         lastRandomIndex = randomProduct(0, imagesArr.length - 1);
-    } while (firstRandomIndex === secondRandomIndex || firstRandomIndex === lastRandomIndex || secondRandomIndex === lastRandomIndex)
-
+    } while (firstRandomIndex === secondRandomIndex || firstRandomIndex === lastRandomIndex || secondRandomIndex === lastRandomIndex || storageIndex.includes(firstRandomIndex) || storageIndex.includes(secondRandomIndex) || storageIndex.includes(lastRandomIndex))
+    
     firstImg.src = SelectProduct.all[firstRandomIndex].path;
     secondImg.src = SelectProduct.all[secondRandomIndex].path;
     lastImg.src = SelectProduct.all[lastRandomIndex].path;
@@ -66,32 +68,39 @@ function render() {
     SelectProduct.all[firstRandomIndex].views++;
     SelectProduct.all[secondRandomIndex].views++;
     SelectProduct.all[lastRandomIndex].views++;
+
+    storageIndex = [];
+    storageIndex.push(firstRandomIndex);
+    storageIndex.push(secondRandomIndex);
+    storageIndex.push(lastRandomIndex);
+    console.log(storageIndex);
 }
-console.log(SelectProduct.all);
 function handler(e) {
     if ((e.target.id === 'first-img' || e.target.id === 'second-img' || e.target.id === 'last-img') && count < 25) {
         count++;
+        render();
     }
-    if (count === 25){
+    if (count === 25) {
+        chartm();
         sectionImg.removeEventListener("click", handler);
     }
-    if(e.target.id === 'first-img') {
+    if (e.target.id === 'first-img') {
         SelectProduct.all[firstRandomIndex].clicked++;
     }
-    if(e.target.id === 'second-img') {
+    if (e.target.id === 'second-img') {
         SelectProduct.all[secondRandomIndex].clicked++;
     }
-    if(e.target.id === 'last-img') {
+    if (e.target.id === 'last-img') {
         SelectProduct.all[lastRandomIndex].clicked++;
     }
-    render();
 }
 function resultViwe() {
-    for(let i = 0; i < imagesArr.length; i++) {
+    for (let i = 0; i < imagesArr.length; i++) {
         let listItem = document.createElement('li');
         resultSection.appendChild(listItem);
         listItem.textContent = `${SelectProduct.all[i].name} had ${SelectProduct.all[i].clicked} votes, and was seen ${SelectProduct.all[i].views} times.`
     }
+    chartm();
     resultBtn.removeEventListener('click', resultViwe);
 }
 sectionImg.addEventListener('click', handler);
@@ -99,6 +108,46 @@ resultBtn.addEventListener('click', resultViwe);
 function randomProduct(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1) + min);
+    let randomImg = Math.floor(Math.random() * (max - min + 1) + min);
+    return randomImg;
 }
 render();
+
+function chartm() {
+    let name = [];
+    let view = [];
+    let click = [];
+    for (let i = 0; i < imagesArr.length; i++) {
+        name.push(SelectProduct.all[i].name);
+        view.push(SelectProduct.all[i].views);
+        click.push(SelectProduct.all[i].clicked);
+    }
+    var ctx = document.getElementById('myChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: name,
+            datasets: [{
+                label: `Number of Views`,
+                data: view,
+                backgroundColor: ['rgb(248, 186, 248)'],
+                borderColor: ['#333'],
+                borderWidth: 1
+            },
+            {
+                label: 'Number of clicked',
+                data: click,
+                backgroundColor: ['#333'],
+                borderColor: ['rgb(248, 186, 248)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
