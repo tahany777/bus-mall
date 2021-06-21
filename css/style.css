@@ -42,6 +42,19 @@ main section img {
 main section img:hover {
     transform: scale(1.08);
 }
+#result-section {
+    padding: 10px;
+    margin-top: 20px;
+}
+#result-section li {
+    padding: 7px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgb(248, 186, 248);
+}
+#result-section li:hover {
+    background-color: lightslategrey;
+    color: #fff;
+}
 .btn {
     display: flex;
     justify-content: center;

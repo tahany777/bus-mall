@@ -26,11 +26,15 @@ let sectionImg = document.getElementById('section-images');
 let firstImg = document.getElementById('first-img');
 let secondImg = document.getElementById('second-img');
 let lastImg = document.getElementById('last-img');
+let resultSection = document.getElementById('result-section');
 let resultBtn = document.getElementById('btn-result');
 
 let count = 0;
-let arr = [];
-let compare = [];
+
+let firstRandomIndex;
+let secondRandomIndex;
+let lastRandomIndex;
+
 function SelectProduct(name, path) {
     this.name = name;
     this.path = `./img/${path}`;
@@ -46,9 +50,9 @@ for (let i = 0; i < imagesArr.length; i++) {
 
 }
 function render() {
-    let firstRandomIndex = randomProduct(0, imagesArr.length - 1);
-    let secondRandomIndex = randomProduct(0, imagesArr.length - 1);
-    let lastRandomIndex = randomProduct(0, imagesArr.length - 1);
+    firstRandomIndex = randomProduct(0, imagesArr.length - 1);
+    secondRandomIndex = randomProduct(0, imagesArr.length - 1);
+    lastRandomIndex = randomProduct(0, imagesArr.length - 1);
 
     do {
         secondRandomIndex = randomProduct(0, imagesArr.length - 1);
@@ -67,17 +71,28 @@ console.log(SelectProduct.all);
 function handler(e) {
     if ((e.target.id === 'first-img' || e.target.id === 'second-img' || e.target.id === 'last-img') && count < 25) {
         count++;
-        render();
-        let secondArr = e.target.currentSrc.split('/')[4];
-        compare.push(secondArr.split('.')[0]);
     }
     if (count === 25){
         sectionImg.removeEventListener("click", handler);
     }
-}
-function resultViwe(e) {
-    for(let i = 0; i < imagesArr.length; i++) {
+    if(e.target.id === 'first-img') {
+        SelectProduct.all[firstRandomIndex].clicked++;
     }
+    if(e.target.id === 'second-img') {
+        SelectProduct.all[secondRandomIndex].clicked++;
+    }
+    if(e.target.id === 'last-img') {
+        SelectProduct.all[lastRandomIndex].clicked++;
+    }
+    render();
+}
+function resultViwe() {
+    for(let i = 0; i < imagesArr.length; i++) {
+        let listItem = document.createElement('li');
+        resultSection.appendChild(listItem);
+        listItem.textContent = `${SelectProduct.all[i].name} had ${SelectProduct.all[i].clicked} votes, and was seen ${SelectProduct.all[i].views} times.`
+    }
+    resultBtn.removeEventListener('click', resultViwe);
 }
 sectionImg.addEventListener('click', handler);
 resultBtn.addEventListener('click', resultViwe);
